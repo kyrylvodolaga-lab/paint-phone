@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ЧЕХОЛЬНАЯ — мастерская покраски чехлов</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Rubik:wght@400;600;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --ink:#101b22; --wall:#172b36; --wall2:#0e1c24; --card:#13252f; --line:#0a141a;
+    --paper:#fff7e8; --sun:#ffcf3f; --coral:#ff6b57; --mint:#35d0ba; --sky:#4ea8ff;
+    --lilac:#b06cf5; --pink:#ff7ab8; --dim:#7fa0b1;
+  }
+  html,body{height:100%}
+  body{
+    font-family:'Rubik',sans-serif; color:#eaf4f8; overflow:hidden;
+    background:
+      radial-gradient(1100px 520px at 50% -8%, rgba(255,214,120,.14), transparent 60%),
+      radial-gradient(700px 500px at 88% 110%, rgba(53,208,186,.10), transparent 60%),
+      radial-gradient(700px 500px at 8% 108%, rgba(255,122,184,.09), transparent 60%),
+      linear-gradient(180deg, var(--wall), var(--wall2));
+  }
+  /* ── кляксы на стене ── */
+  .splash{position:fixed;border-radius:50%;filter:blur(1px);opacity:.14;pointer-events:none;animation:bob 7s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(6deg)}}
+  /* ── гирлянда ── */
+  .garland{position:fixed;top:56px;left:0;right:0;height:26px;pointer-events:none;z-index:4;
+    background-image:
+      radial-gradient(circle 4px at 24px 14px, #ffd23f 0 4px, transparent 5px),
+      radial-gradient(circle 4px at 70px 20px, #ff6b57 0 4px, transparent 5px),
+      radial-gradient(circle 4px at 116px 14px, #35d0ba 0 4px, transparent 5px),
+      radial-gradient(circle 4px at 162px 20px, #4ea8ff 0 4px, transparent 5px);
+    background-size:184px 26px;background-repeat:repeat-x;
+    filter:drop-shadow(0 0 6px rgba(255,210,90,.5));animation:glowF 3s ease-in-out infinite}
+  @keyframes glowF{0%,100%{opacity:1}50%{opacity:.72}}
+
+  /* ══ ВЕРХНЯЯ ПАНЕЛЬ ══ */
+  header{position:relative;z-index:6;display:flex;align-items:center;gap:14px;padding:9px 18px;
+    background:linear-gradient(#22394599,#12232c);border-bottom:3px solid var(--line)}
+  .sign{font-family:'Unbounded';font-weight:900;font-size:19px;letter-spacing:2px;animation:swing 5s ease-in-out infinite;transform-origin:top}
+  @keyframes swing{0%,100%{transform:rotate(-.6deg)}50%{transform:rotate(.6deg)}}
+  .sign b:nth-child(1){color:var(--coral)}.sign b:nth-child(2){color:var(--sun)}.sign b:nth-child(3){color:var(--mint)}
+  .sign b:nth-child(4){color:var(--sky)}.sign b:nth-child(5){color:var(--lilac)}.sign b:nth-child(6){color:var(--pink)}
+  .sign b:nth-child(7){color:var(--coral)}.sign b:nth-child(8){color:var(--mint)}.sign b:nth-child(9){color:var(--sun)}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:#0d1a21;border:2px solid var(--line);
+    border-radius:999px;padding:5px 13px;font-weight:600;font-size:14px;box-shadow:0 3px 0 var(--line)}
+  .pill.money{color:var(--sun);font-family:'Unbounded';font-size:13px}
+  .pill.money.pop{animation:popM .35s}
+  @keyframes popM{40%{transform:scale(1.16)}}
+  .spacer{flex:1}
+  #muteBtn{cursor:pointer;font-size:17px;background:#0d1a21;border:2px solid var(--line);border-radius:10px;
+    padding:5px 10px;box-shadow:0 3px 0 var(--line);transition:.15s}
+  #muteBtn:hover{transform:translateY(-2px)}
+
+  /* ══ СЦЕНА ══ */
+  .stage{position:relative;z-index:5;display:flex;gap:16px;padding:16px;height:calc(100vh - 58px);min-height:540px}
+  .panel{background:var(--card);border:3px solid var(--line);border-radius:18px;box-shadow:0 8px 0 rgba(0,0,0,.35)}
+
+  /* ── клиент ── */
+  .client-zone{width:305px;padding:16px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+  .cz-title{font-family:'Unbounded';font-size:11px;letter-spacing:3px;color:var(--dim)}
+  #clientWrap{display:flex;flex-direction:column;gap:12px;transition:.4s}
+  #clientWrap.in{animation:slideIn .55s cubic-bezier(.2,1.4,.4,1)}
+  #clientWrap.out{animation:slideOut .45s ease-in forwards}
+  @keyframes slideIn{from{transform:translateX(-130%);opacity:0}to{transform:none;opacity:1}}
+  @keyframes slideOut{to{transform:translateX(-130%);opacity:0}}
+  .avatar-row{display:flex;align-items:center;gap:12px}
+  #avatar{font-size:52px;animation:idleBob 2.4s ease-in-out infinite;filter:drop-shadow(0 5px 4px rgba(0,0,0,.4))}
+  @keyframes idleBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+  #clientName{font-family:'Unbounded';font-weight:700;font-size:17px}
+  #clientMood{font-size:22px;margin-left:auto}
+  .bubble{position:relative;background:var(--paper);color:#233240;border-radius:16px;padding:13px 14px;
+    font-family:'Caveat';font-size:22px;line-height:1.15;box-shadow:0 4px 0 rgba(0,0,0,.3);animation:popB .4s .2s cubic-bezier(.2,1.6,.4,1) backwards}
+  @keyframes popB{from{transform:scale(.6);opacity:0}}
+  .bubble::before{content:'';position:absolute;top:-12px;left:34px;border:10px solid transparent;border-bottom-color:var(--paper)}
+  .order-label{font-family:'Rubik';font-weight:800;font-size:11px;letter-spacing:2px;color:#8a6d3b;margin:8px 0 6px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:2px solid #233240;border-radius:999px;
+    padding:3px 11px;font-family:'Rubik';font-weight:600;font-size:13px;color:#233240}
+  .chip i{width:14px;height:14px;border-radius:50%;display:inline-block;border:2px solid rgba(0,0,0,.25)}
+  .chip.free{background:#ffe9a8}
+  .chip.ok{background:#d9f7dd;border-color:#1c7c3d;color:#14522a}
+  .chip.bad{background:#ffdcdc;border-color:#b34040;color:#8c2626;text-decoration:line-through}
+  .patience{margin-top:auto}
+  .pat-face{font-size:20px;margin-bottom:4px}
+  .pat-bar{height:13px;background:#0a141a;border-radius:99px;overflow:hidden;border:2px solid var(--line)}
+  #patFill{height:100%;width:100%;background:linear-gradient(90deg,#7ad64a,#c8e05a);transition:width .12s linear}
+  .pat-time{font-size:12px;color:var(--dim);margin-top:4px;text-align:right;font-weight:600}
+
+  /* ── верстак ── */
+  .bench-zone{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:
+      radial-gradient(600px 300px at 50% 0%, rgba(255,222,140,.12), transparent 65%),
+      linear-gradient(180deg,#8a5a33,#6d4225 70%,#5a3519);
+    border:3px solid var(--line);border-radius:18px;box-shadow:0 8px 0 rgba(0,0,0,.35);overflow:hidden}
+  .bench-zone::before{content:'';position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(90deg, rgba(0,0,0,.10) 0 2px, transparent 2px 88px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 3px, transparent 3px 60px)}
+  .lamp-cone{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:380px;height:80%;pointer-events:none;
+    background:radial-gradient(ellipse at top, rgba(255,232,160,.30), transparent 62%)}
+  .lamp-fix{position:absolute;top:0;left:50%;transform:translateX(-50%);width:74px;height:26px;background:#20343f;
+    border-radius:0 0 40px 40px;border:3px solid var(--line);border-top:none;z-index:2}
+  .lamp-fix::after{content:'';position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);width:22px;height:22px;
+    border-radius:50%;background:radial-gradient(circle at 40% 35%, #fff8d8, #ffd23f 70%);box-shadow:0 0 22px 8px rgba(255,214,90,.55)}
+  .case-holder{position:relative;width:min(345px,86%);aspect-ratio:420/700;filter:drop-shadow(0 16px 18px rgba(0,0,0,.45))}
+  .case-holder canvas{position:absolute;inset:0;width:100%;height:100%}
+  #paintCv{cursor:none;touch-action:none}
+  #cursorRing{position:absolute;pointer-events:none;border:2px dashed rgba(20,25,30,.55);border-radius:50%;
+    transform:translate(-50%,-50%);display:none;align-items:center;justify-content:center;font-size:26px;z-index:3}
+  .model-tag{position:absolute;bottom:16px;left:50%;transform:translateX(-50%) rotate(-2deg);background:var(--paper);
+    color:#5a4020;font-family:'Caveat';font-weight:700;font-size:20px;padding:4px 16px;border-radius:8px;
+    box-shadow:0 4px 0 rgba(0,0,0,.3);z-index:2}
+  .model-tag::before{content:'📌';position:absolute;top:-13px;left:8px;font-size:15px}
+  .bench-zone.shake{animation:shk .4s}
+  @keyframes shk{20%{transform:rotate(1deg)}40%{transform:rotate(-1.2deg)}60%{transform:rotate(.8deg)}80%{transform:rotate(-.5deg)}}
+
+  /* ── инструменты ── */
+  .tools-zone{width:262px;padding:14px;display:flex;flex-direction:column;gap:11px;overflow-y:auto}
+  .sec-t{font-family:'Unbounded';font-size:10px;letter-spacing:3px;color:var(--dim)}
+  .tool-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  .tbtn{aspect-ratio:1;font-size:21px;background:#0d1a21;border:2px solid var(--line);border-radius:12px;cursor:pointer;
+    box-shadow:0 3px 0 var(--line);transition:.13s;display:flex;align-items:center;justify-content:center}
+  .tbtn:hover{transform:translateY(-3px)}
+  .tbtn:active{transform:translateY(1px);box-shadow:0 1px 0 var(--line)}
+  .tbtn.active{background:var(--sun);box-shadow:0 3px 0 #a67c0e}
+  .swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+  .sw{aspect-ratio:1;border-radius:50%;border:3px solid var(--line);cursor:pointer;transition:.13s;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+  .sw:hover{transform:scale(1.14) rotate(8deg)}
+  .sw.active{outline:3px solid var(--paper);outline-offset:2px;transform:scale(1.1)}
+  .sizes{display:flex;gap:8px}
+  .szBtn{flex:1;background:#0d1a21;border:2px solid var(--line);border-radius:10px;padding:7px 0;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 var(--line);transition:.13s}
+  .szBtn span{background:#eaf4f8;border-radius:50%;display:block}
+  .szBtn.active{background:var(--mint)}
+  .stickers{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .stk{font-size:21px;background:#0d1a21;border:2px solid var(--line);border-radius:10px;padding:5px 0;cursor:pointer;
+    transition:.13s;box-shadow:0 2px 0 var(--line)}
+  .stk:hover{transform:scale(1.15) rotate(-6deg)}
+  .stk.active{background:var(--pink)}
+  .row2{display:flex;gap:8px}
+  .sbtn{flex:1;background:#0d1a21;border:2px solid var(--line);color:#eaf4f8;font-family:'Rubik';font-weight:700;
+    font-size:13px;border-radius:11px;padding:9px 0;cursor:pointer;box-shadow:0 3px 0 var(--line);transition:.13s}
+  .sbtn:hover{transform:translateY(-2px)}
+  .sbtn:active{transform:translateY(1px)}
+  #deliverBtn{margin-top:auto;background:var(--coral);border:3px solid var(--line);color:#fff;font-family:'Unbounded';
+    font-weight:700;font-size:15px;border-radius:14px;padding:15px 0;cursor:pointer;box-shadow:0 5px 0 #8c2a1d;
+    transition:.14s;letter-spacing:1px}
+  #deliverBtn:hover{transform:translateY(-3px) rotate(-.6deg);box-shadow:0 8px 0 #8c2a1d}
+  #deliverBtn:active{transform:translateY(2px);box-shadow:0 2px 0 #8c2a1d}
+  #deliverBtn:disabled{opacity:.45;cursor:default;transform:none}
+
+  /* ── тост результата ── */
+  #toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) scale(.7);opacity:0;pointer-events:none;z-index:60;
+    background:var(--paper);color:#233240;border:3px solid var(--line);border-radius:18px;padding:18px 26px;
+    text-align:center;box-shadow:0 10px 0 rgba(0,0,0,.35);transition:.3s cubic-bezier(.2,1.5,.4,1);min-width:300px}
+  #toast.show{transform:translateX(-50%) scale(1);opacity:1}
+  #toast .t-stars{font-size:34px;letter-spacing:3px}
+  #toast .t-phrase{font-family:'Caveat';font-size:26px;margin:2px 0 8px}
+  #toast .t-rows{display:flex;flex-direction:column;gap:5px;align-items:center;margin-bottom:8px}
+  #toast .t-money{font-family:'Unbounded';font-weight:900;font-size:20px;color:#1c7c3d}
+  #toast.angry{background:#ffdcdc}
+  .fly-money{position:fixed;z-index:70;font-family:'Unbounded';font-weight:900;color:var(--sun);font-size:22px;
+    pointer-events:none;text-shadow:0 2px 0 #6b4c00;animation:flyUp 1.2s ease-out forwards}
+  @keyframes flyUp{to{transform:translateY(-90px);opacity:0}}
+
+  /* ── оверлеи ── */
+  .overlay{position:fixed;inset:0;z-index:80;background:rgba(8,16,21,.86);display:flex;align-items:center;
+    justify-content:center;opacity:0;pointer-events:none;transition:.35s}
+  .overlay.show{opacity:1;pointer-events:auto}
+  .ov-card{background:var(--paper);color:#233240;border:4px solid var(--line);border-radius:22px;padding:34px 42px;
+    max-width:560px;width:92%;text-align:center;box-shadow:0 12px 0 rgba(0,0,0,.4);transform:translateY(24px);transition:.35s}
+  .overlay.show .ov-card{transform:none}
+  .big-sign{font-family:'Unbounded';font-weight:900;font-size:clamp(34px,6vw,54px);letter-spacing:3px;line-height:1.05}
+  .tagline{font-family:'Caveat';font-size:27px;color:#8a5a33;margin:8px 0 18px}
+  .steps{display:flex;flex-direction:column;gap:9px;text-align:left;margin-bottom:22px}
+  .step{display:flex;gap:12px;align-items:center;background:#fff;border:2px solid #233240;border-radius:12px;padding:9px 14px;font-weight:600}
+  .step b{font-size:24px}
+  .big-btn{background:var(--coral);border:3px solid var(--line);color:#fff;font-family:'Unbounded';font-weight:700;
+    font-size:18px;border-radius:16px;padding:16px 34px;cursor:pointer;box-shadow:0 6px 0 #8c2a1d;transition:.15s;letter-spacing:1px}
+  .big-btn:hover{transform:translateY(-3px) rotate(-.8deg)}
+  .big-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #8c2a1d}
+  .stat-line{font-size:18px;font-weight:600;margin:6px 0}
+  .stat-line b{color:#b34040}
+  .ov-sub{font-family:'Caveat';font-size:24px;color:#8a5a33;margin-bottom:16px}
+  .hint{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:6;color:var(--dim);font-size:12px;font-weight:600;letter-spacing:.5px}
+
+  @media (max-width:980px){
+    .stage{flex-direction:column;height:auto;overflow-y:auto}
+    body{overflow:auto}
+    .client-zone,.tools-zone{width:100%}
+    .bench-zone{min-height:520px}
+    #deliverBtn{margin-top:4px}
+  }
+</style>
+</head>
+<body>
+
+<div class="splash" style="width:120px;height:120px;background:var(--coral);top:18%;left:4%"></div>
+<div class="splash" style="width:80px;height:80px;background:var(--sky);top:64%;left:9%;animation-delay:1.2s"></div>
+<div class="splash" style="width:100px;height:100px;background:var(--mint);top:24%;right:5%;animation-delay:.6s"></div>
+<div class="splash" style="width:70px;height:70px;background:var(--lilac);top:70%;right:8%;animation-delay:2s"></div>
+<div class="garland"></div>
+
+<header>
+  <div class="sign"><b>Ч</b><b>Е</b><b>Х</b><b>О</b><b>Л</b><b>Ь</b><b>Н</b><b>А</b><b>Я</b>&nbsp;🖌️</div>
+  <span class="pill" id="dayInfo">День 1 · Клиент 1/4</span>
+  <span class="spacer"></span>
+  <span class="pill money" id="moneyEl">0 ₽</span>
+  <span class="pill" id="heartsEl">❤️❤️❤️</span>
+  <span id="muteBtn" title="звук">🔊</span>
+</header>
+
+<div class="stage">
+  <!-- КЛИЕНТ -->
+  <section class="panel client-zone">
+    <div class="cz-title">◈ КЛИЕНТ</div>
+    <div id="clientWrap">
+      <div class="avatar-row">
+        <div id="avatar">🧑‍🎤</div>
+        <div id="clientName">…</div>
+        <div id="clientMood">😊</div>
+      </div>
+      <div class="bubble">
+        <div id="greetTxt">…</div>
+        <div class="order-label">ЗАКАЗ:</div>
+        <div class="chips" id="orderChips"></div>
+      </div>
+      <div class="patience">
+        <div class="pat-face" id="patFace">😊 терпение</div>
+        <div class="pat-bar"><div id="patFill"></div></div>
+        <div class="pat-time" id="patTime">60 c</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВЕРСТАК -->
+  <section class="bench-zone" id="bench">
+    <div class="lamp-cone"></div>
+    <div class="lamp-fix"></div>
+    <div class="case-holder" id="holder">
+      <canvas id="baseCv" width="420" height="700" style="pointer-events:none"></canvas>
+      <canvas id="paintCv" width="420" height="700"></canvas>
+      <canvas id="fxCv" width="420" height="700" style="pointer-events:none"></canvas>
+      <div id="cursorRing"></div>
+    </div>
+    <div class="model-tag" id="modelTag">«Грушафон 12»</div>
+  </section>
+
+  <!-- ИНСТРУМЕНТЫ -->
+  <aside class="panel tools-zone">
+    <div class="sec-t">◈ ИНСТРУМЕНТЫ</div>
+    <div class="tool-grid" id="toolGrid">
+      <button class="tbtn active" data-tool="brush" title="Кисть">🖌️</button>
+      <button class="tbtn" data-tool="spray" title="Баллончик">💨</button>
+      <button class="tbtn" data-tool="fill" title="Залить весь чехол">🪣</button>
+      <button class="tbtn" data-tool="sticker" title="Наклейки">🎀</button>
+      <button class="tbtn" data-tool="eraser" title="Ластик">🧽</button>
+    </div>
+    <div class="sec-t">◈ КРАСКИ</div>
+    <div class="swatches" id="swatches"></div>
+    <div class="sec-t">◈ ТОЛЩИНА</div>
+    <div class="sizes" id="sizes">
+      <button class="szBtn" data-s="10"><span style="width:7px;height:7px"></span></button>
+      <button class="szBtn active" data-s="24"><span style="width:14px;height:14px"></span></button>
+      <button class="szBtn" data-s="44"><span style="width:22px;height:22px"></span></button>
+    </div>
+    <div class="sec-t">◈ НАКЛЕЙКИ</div>
+    <div class="stickers" id="stickers"></div>
+    <div class="row2">
+      <button class="sbtn" id="undoBtn">↩ Отменить</button>
+      <button class="sbtn" id="clearBtn">🗑 Очистить</button>
+    </div>
+    <button id="deliverBtn">📦 ОТДАТЬ КЛИЕНТУ</button>
+  </aside>
+</div>
+
+<div class="hint">кисть · баллончик · заливка · наклейки — экспериментируй, но следи за терпением клиента! ⏳</div>
+
+<!-- ТОСТ -->
+<div id="toast">
+  <div class="t-stars" id="tStars"></div>
+  <div class="t-phrase" id="tPhrase"></div>
+  <div class="t-rows" id="tRows"></div>
+  <div class="t-money" id="tMoney"></div>
+</div>
+
+<!-- СТАРТ -->
+<div class="overlay show" id="startOv">
+  <div class="ov-card">
+    <div class="big-sign"><span style="color:var(--coral)">Ч</span><span style="color:var(--sun)">Е</span><span style="color:var(--mint)">Х</span><span style="color:var(--sky)">О</span><span style="color:var(--lilac)">Л</span><span style="color:var(--pink)">Ь</span><span style="color:var(--coral)">Н</span><span style="color:var(--mint)">А</span><span style="color:var(--sun)">Я</span></div>
+    <div class="tagline">мастерская покраски чехлов — раскрась как хочешь или по заказу!</div>
+    <div class="steps">
+      <div class="step"><b>🧑‍🎤</b> Клиент приносит телефон и говорит модель + пожелания.</div>
+      <div class="step"><b>🖌️</b> Крась чехол: кисть, баллончик, заливка, наклейки. Модель определяет форму!</div>
+      <div class="step"><b>⭐</b> Отдай вовремя — попади в заказ и получи деньги. 3 провала = конец смены навсегда.</div>
+    </div>
+    <button class="big-btn" id="startBtn">🔓 ОТКРЫТЬ МАСТЕРСКУЮ</button>
+  </div>
+</div>
+
+<!-- ИТОГИ ДНЯ -->
+<div class="overlay" id="dayOv">
+  <div class="ov-card">
+    <div class="big-sign" style="font-size:34px;color:#1c7c3d">СМЕНА ОКОНЧЕНА 🔔</div>
+    <div class="ov-sub" id="dayOvSub"></div>
+    <div class="stat-line">Заработано за день: <b id="dayEarnV" style="color:#1c7c3d"></b></div>
+    <div class="stat-line">Всего в кассе: <b id="dayTotalV" style="color:#b8860b"></b></div>
+    <div class="stat-line">Репутация: <span id="dayHeartsV"></span></div>
+    <div class="stat-line" style="color:#8a5a33;font-family:Caveat;font-size:22px" id="coffeeV"></div>
+    <br>
+    <button class="big-btn" id="nextDayBtn">☀️ СЛЕДУЮЩИЙ ДЕНЬ</button>
+  </div>
+</div>
+
+<!-- ГЕЙМОВЕР -->
+<div class="overlay" id="overOv">
+  <div class="ov-card">
+    <div style="font-size:64px">💔</div>
+    <div class="big-sign" style="font-size:32px;color:#b34040">МАСТЕРСКАЯ ЗАКРЫТА</div>
+    <div class="ov-sub">репутация упала до нуля…</div>
+    <div class="stat-line">Дней проработано: <b id="ovDays"></b></div>
+    <div class="stat-line">Заработано всего: <b id="ovMoney" style="color:#1c7c3d"></b></div>
+    <div class="stat-line">Клиентов обслужено: <b id="ovClients"></b></div>
+    <br>
+    <button class="big-btn" id="retryBtn">🔄 ОТКРЫТЬСЯ СНОВА</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ═══════════════ ДАННЫЕ ═══════════════ */
+const COLORS=[
+  {hex:'#e63946',bucket:'red',label:'красный'},
+  {hex:'#f77f00',bucket:'orange',label:'оранжевый'},
+  {hex:'#ffd23f',bucket:'yellow',label:'жёлтый'},
+  {hex:'#8ac926',bucket:'green',label:'салатовый'},
+  {hex:'#2a9d34',bucket:'green',label:'зелёный'},
+  {hex:'#2ec4b6',bucket:'teal',label:'бирюзовый'},
+  {hex:'#3a86ff',bucket:'blue',label:'синий'},
+  {hex:'#8338ec',bucket:'purple',label:'фиолетовый'},
+  {hex:'#ff5d8f',bucket:'pink',label:'розовый'},
+  {hex:'#8c5a33',bucket:'brown',label:'коричневый'},
+  {hex:'#f6f1e7',bucket:'white',label:'белый'},
+  {hex:'#23252b',bucket:'black',label:'чёрный'},
+];
+const STICKERS=['⭐','❤️','🌸','🔥','⚡','🌈','🦄','🍀','🐱','💎','🍩','👾','🌙','🍉','🫧'];
+const MODELS=[
+  {name:'Грушафон 12', w:300,h:600,r:46, module:{x:18,y:18,w:112,h:112,r:30},
+   lenses:[{x:52,y:52,r:23},{x:96,y:96,r:23}]},
+  {name:'Грушафон 15 Про', w:300,h:610,r:52, module:{x:16,y:16,w:120,h:120,r:34},
+   lenses:[{x:47,y:49,r:23},{x:47,y:103,r:23},{x:99,y:76,r:23}]},
+  {name:'Галактика S24', w:300,h:620,r:36, module:null,
+   lenses:[{x:52,y:62,r:22},{x:52,y:122,r:22},{x:52,y:182,r:22}]},
+  {name:'Пиксельфон 9', w:310,h:610,r:46, module:{x:14,y:34,w:282,h:64,r:32,visor:true},
+   lenses:[{x:92,y:66,r:20},{x:178,y:66,r:20}]},
+  {name:'Мобила Х5', w:290,h:590,r:30, module:null,
+   lenses:[{x:78,y:80,r:38}], flash:{x:150,y:54,r:9}},
+];
+const NAMES=['Ася','Боря','Вера','Гоша','Даша','Женя','Зоя','Игорь','Кира','Лёва','Мила','Никита','Оля','Паша','Рита','Сёма','Тоня','Федя','Юля','Эдик'];
+const AVATARS=['🧑‍🎨','👩‍🎤','🧔','👵','👨‍🚀','🧕','👦','👩‍🦰','🧑‍🎓','👨‍🍳','👩‍🔧','🕵️‍♀️','🧙‍♂️','👸','🤠','🧛‍♂️','👷‍♀️','🥷'];
+const GREETS=['Привет! Мне нужен чехол на','Хеллоу! Вот мой','Добрый день! Хочу чехол на','Здрасьте! Срочно нужен чехол на','Йо! Зацени мой'];
+const PHRASES={
+ 1:['Это… точно готово?','Я такое не ношу.','Нуу… бывает.','Верните мне мой серый чехол.'],
+ 2:['Сойдёт, но ждал(а) большего.','Неплохо, но не ах.','Хм. Ладно, возьму.'],
+ 3:['Нормально!','Крепкая работа 👍','Окей, беру!'],
+ 4:['О, классно!','Мне нравится!','Стильно получилось!'],
+ 5:['ВАУ! Идеально!','Это ШЕДЕВР!!','Лучший мастер города!','Я всем друзьям расскажу!!']};
+const CW=420, CH=700;
+
+/* ═══════════════ ЭЛЕМЕНТЫ ═══════════════ */
+const $=s=>document.querySelector(s);
+const baseCv=$('#baseCv'), paintCv=$('#paintCv'), fxCv=$('#fxCv');
+const bctx=baseCv.getContext('2d'), pctx=paintCv.getContext('2d'), xctx=fxCv.getContext('2d');
+const holder=$('#holder'), ring=$('#cursorRing');
+
+/* ═══════════════ СОСТОЯНИЕ ═══════════════ */
+const S={day:1,clientIdx:0,clientsTotal:4,money:0,hearts:3,combo:0,served:0,
+  dayEarn:0,order:null,model:null,stickers:[],snapshots:[],mask:null,
+  tool:'brush',color:COLORS[6],size:24,sticker:'⭐',
+  busy:true,muted:false,patLeft:0,patTotal:0,patTimer:null};
+
+/* ═══════════════ ЗВУК ═══════════════ */
+let AC=null,lastSpraySfx=0;
+function ac(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended')AC.resume(); return AC;}
+function tone(f,d,type,v,f2){ if(S.muted)return; try{const c=ac(),o=c.createOscillator(),g=c.createGain();
+  o.type=type||'square'; o.frequency.setValueAtTime(f,c.currentTime);
+  if(f2)o.frequency.exponentialRampToValueAtTime(f2,c.currentTime+d);
+  g.gain.setValueAtTime(v||.12,c.currentTime); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d);
+  o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+d);}catch(e){}}
+function noiseSfx(d,v,fq){ if(S.muted)return; try{const c=ac(),b=c.createBuffer(1,c.sampleRate*d,c.sampleRate),
+  data=b.getChannelData(0); for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;
+  const src=c.createBufferSource();src.buffer=b;const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=fq;
+  const g=c.createGain();g.gain.setValueAtTime(v,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d);
+  src.connect(f);f.connect(g);g.connect(c.destination);src.start();}catch(e){}}
+const sfx={
+  click:()=>tone(660,.06,'square',.08),
+  pop:()=>tone(480,.09,'sine',.14,900),
+  spray:()=>{const n=performance.now(); if(n-lastSpraySfx>85){noiseSfx(.06,.05,3200);lastSpraySfx=n;}},
+  stroke:()=>{const n=performance.now(); if(n-lastSpraySfx>120){noiseSfx(.04,.028,1400);lastSpraySfx=n;}},
+  fill:()=>tone(300,.18,'sine',.12,700),
+  coin:()=>{tone(880,.08,'square',.1);setTimeout(()=>tone(1320,.12,'square',.1),80);},
+  good:()=>[660,880,1046,1318].forEach((f,i)=>setTimeout(()=>tone(f,.12,'triangle',.12),i*90)),
+  bad:()=>tone(200,.35,'sawtooth',.12,90),
+  swoosh:()=>noiseSfx(.14,.09,700),
+};
+
+/* ═══════════════ МОДЕЛЬ / РИСОВАНИЕ КЕЙСА ═══════════════ */
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function caseGeom(m){return {ox:(CW-m.w)/2, oy:(CH-m.h)/2};}
+function holeSpots(m){const g=caseGeom(m),out=[];
+  m.lenses.forEach(l=>out.push({x:g.ox+l.x,y:g.oy+l.y,r:l.r+3}));
+  if(m.flash)out.push({x:g.ox+m.flash.x,y:g.oy+m.flash.y,r:m.flash.r+2});
+  return out;}
+function punch(ctx,m){ctx.save();ctx.globalCompositeOperation='destination-out';
+  holeSpots(m).forEach(h=>{ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,7);ctx.fill();});ctx.restore();}
+function setupCase(m){
+  S.model=m; S.stickers=[]; S.snapshots=[];
+  const g=caseGeom(m);
+  // base
+  bctx.clearRect(0,0,CW,CH);
+  const grad=bctx.createLinearGradient(0,g.oy,0,g.oy+m.h);
+  grad.addColorStop(0,'#fdfaf2');grad.addColorStop(1,'#e6e0d2');
+  rr(bctx,g.ox,g.oy,m.w,m.h,m.r);bctx.fillStyle=grad;bctx.fill();
+  bctx.lineWidth=4;bctx.strokeStyle='rgba(18,25,32,.5)';bctx.stroke();
+  punch(bctx,m);
+  // paint layer
+  pctx.clearRect(0,0,CW,CH);
+  // fx
+  xctx.clearRect(0,0,CW,CH);
+  if(m.module&&!m.module.visor){const mm=m.module;
+    rr(xctx,g.ox+mm.x,g.oy+mm.y,mm.w,mm.h,mm.r);
+    xctx.fillStyle='rgba(0,0,0,.10)';xctx.fill();xctx.lineWidth=2;
+    xctx.strokeStyle='rgba(0,0,0,.35)';xctx.stroke();}
+  if(m.module&&m.module.visor){const mm=m.module;
+    rr(xctx,g.ox+mm.x,g.oy+mm.y,mm.w,mm.h,mm.r);
+    xctx.fillStyle='#1c2b34';xctx.fill();xctx.lineWidth=3;
+    xctx.strokeStyle='#0b1319';xctx.stroke();}
+  holeSpots(m).forEach(h=>{
+    xctx.beginPath();xctx.arc(h.x,h.y,h.r,0,7);
+    xctx.lineWidth=5;xctx.strokeStyle='#141e26';xctx.stroke();
+    const lg=xctx.createRadialGradient(h.x-h.r*.3,h.y-h.r*.3,1,h.x,h.y,h.r*.72);
+    lg.addColorStop(0,'#3d5a72');lg.addColorStop(.6,'#16242f');lg.addColorStop(1,'#0a1116');
+    xctx.beginPath();xctx.arc(h.x,h.y,h.r*.72,0,7);xctx.fillStyle=lg;xctx.fill();
+    xctx.beginPath();xctx.arc(h.x-h.r*.28,h.y-h.r*.3,h.r*.14,0,7);
+    xctx.fillStyle='rgba(255,255,255,.7)';xctx.fill();});
+  // маска для оценки
+  const mc=document.createElement('canvas');mc.width=CW;mc.height=CH;
+  const mctx=mc.getContext('2d');
+  rr(mctx,g.ox,g.oy,m.w,m.h,m.r);mctx.fillStyle='#fff';mctx.fill();
+  mctx.globalCompositeOperation='destination-out';
+  holeSpots(m).forEach(h=>{mctx.beginPath();mctx.arc(h.x,h.y,h.r,0,7);mctx.fill();});
+  S.mask=mctx.getImageData(0,0,CW,CH).data;
+  $('#modelTag').textContent='«'+m.name+'»';
+}
+
+/* ═══════════════ СНЭПШОТЫ ═══════════════ */
+function snapshot(){S.snapshots.push({img:pctx.getImageData(0,0,CW,CH),stk:S.stickers.slice()});
+  if(S.snapshots.length>18)S.snapshots.shift();}
+function undo(){ if(S.busy||!S.snapshots.length)return; sfx.click();
+  const st=S.snapshots.pop(); pctx.putImageData(st.img,0,0); S.stickers=st.stk;}
+$('#undoBtn').onclick=undo;
+$('#clearBtn').onclick=()=>{ if(S.busy)return; sfx.pop(); snapshot();
+  pctx.clearRect(0,0,CW,CH); S.stickers=[];};
+
+/* ═══════════════ РИСОВАНИЕ ═══════════════ */
+let drawing=false, sprayOn=false, lastP=null, curP=null;
+function pos(e){const r=paintCv.getBoundingClientRect();
+  return {x:(e.clientX-r.left)*CW/r.width, y:(e.clientY-r.top)*CH/r.height};}
+function seg(a,b,erase){pctx.save();
+  rr(pctx,caseGeom(S.model).ox,caseGeom(S.model).oy,S.model.w,S.model.h,S.model.r);pctx.clip();
+  if(erase)pctx.globalCompositeOperation='destination-out';
+  pctx.strokeStyle=S.color.hex;pctx.fillStyle=S.color.hex;
+  pctx.lineWidth=S.size;pctx.lineCap='round';pctx.lineJoin='round';
+  if(a&&b){pctx.beginPath();pctx.moveTo(a.x,a.y);pctx.lineTo(b.x,b.y);pctx.stroke();}
+  else if(b){pctx.beginPath();pctx.arc(b.x,b.y,S.size/2,0,7);pctx.fill();}
+  pctx.restore(); punch(pctx,S.model);}
+function sprayAt(p){pctx.save();
+  rr(pctx,caseGeom(S.model).ox,caseGeom(S.model).oy,S.model.w,S.model.h,S.model.r);pctx.clip();
+  pctx.fillStyle=S.color.hex;const R=S.size*1.5;
+  for(let i=0;i<16;i++){const a=Math.random()*7,d=Math.random()*R;
+    pctx.globalAlpha=.25+Math.random()*.4;
+    pctx.beginPath();pctx.arc(p.x+Math.cos(a)*d,p.y+Math.sin(a)*d,1.4+Math.random()*1.8,0,7);pctx.fill();}
+  pctx.restore(); punch(pctx,S.model);}
+function placeSticker(p){snapshot();
+  pctx.save();
+  rr(pctx,caseGeom(S.model).ox,caseGeom(S.model).oy,S.model.w,S.model.h,S.model.r);pctx.clip();
+  pctx.font='46px serif';pctx.textAlign='center';pctx.textBaseline='middle';
+  pctx.fillText(S.sticker,p.x,p.y);
+  pctx.restore(); punch(pctx,S.model);
+  S.stickers.push(S.sticker); sfx.pop();}
+function fillCase(){ if(S.busy)return; snapshot(); sfx.fill();
+  pctx.save();
+  rr(pctx,caseGeom(S.model).ox,caseGeom(S.model).oy,S.model.w,S.model.h,S.model.r);pctx.clip();
+  pctx.fillStyle=S.color.hex;pctx.fillRect(0,0,CW,CH);pctx.restore();
+  punch(pctx,S.model);}
+
+paintCv.addEventListener('pointerdown',e=>{ if(S.busy)return; ac();
+  const p=pos(e); paintCv.setPointerCapture(e.pointerId);
+  if(S.tool==='fill'){fillCase();return;}
+  if(S.tool==='sticker'){placeSticker(p);return;}
+  snapshot(); drawing=true; lastP=p; curP=p;
+  if(S.tool==='spray'){sprayOn=true;sprayLoop();} else {seg(null,p);sfx.stroke();}});
+paintCv.addEventListener('pointermove',e=>{ const p=pos(e); curP=p; updateRing(e);
+  if(!drawing||S.tool==='spray')return;
+  const dx=p.x-lastP.x,dy=p.y-lastP.y,dist=Math.hypot(dx,dy),steps=Math.max(1,Math.floor(dist/(S.size/4)));
+  for(let i=1;i<=steps;i++)seg(lastP,{x:lastP.x+dx*i/steps,y:lastP.y+dy*i/steps});
+  lastP=p; sfx.stroke();});
+function endStroke(){drawing=false;sprayOn=false;lastP=null;}
+paintCv.addEventListener('pointerup',endStroke);
+paintCv.addEventListener('pointercancel',endStroke);
+paintCv.addEventListener('pointerleave',()=>{ring.style.display='none';});
+function sprayLoop(){ if(!sprayOn||!curP)return; sprayAt(curP); sfx.spray(); requestAnimationFrame(sprayLoop);}
+
+/* курсор-кольцо */
+function updateRing(e){ const r=holder.getBoundingClientRect();
+  ring.style.display='flex';
+  ring.style.left=(e.clientX-r.left)+'px'; ring.style.top=(e.clientY-r.top)+'px';
+  const sc=r.width/CW;
+  if(S.tool==='sticker'){ring.style.width=ring.style.height=(46*sc)+'px';
+    ring.style.borderStyle='none';ring.textContent=S.sticker;ring.style.fontSize=(34*sc)+'px';}
+  else{const d=(S.tool==='spray'?S.size*3:S.size)*sc;
+    ring.style.width=ring.style.height=d+'px';ring.textContent='';
+    ring.style.borderStyle='dashed';ring.style.fontSize='0';}}
+holder.addEventListener('pointermove',updateRing);
+
+/* ═══════════════ ПАНЕЛИ ИНСТРУМЕНТОВ ═══════════════ */
+document.querySelectorAll('#toolGrid .tbtn').forEach(b=>b.onclick=()=>{
+  sfx.click(); S.tool=b.dataset.tool;
+  document.querySelectorAll('#toolGrid .tbtn').forEach(x=>x.classList.toggle('active',x===b));});
+document.querySelectorAll('#sizes .szBtn').forEach(b=>b.onclick=()=>{
+  sfx.click(); S.size=+b.dataset.s;
+  document.querySelectorAll('#sizes .szBtn').forEach(x=>x.classList.toggle('active',x===b));});
+const swBox=$('#swatches');
+COLORS.forEach((c,i)=>{const d=document.createElement('div');d.className='sw'+(i===6?' active':'');
+  d.style.background=c.hex;d.title=c.label;
+  d.onclick=()=>{sfx.click();S.color=c;swBox.querySelectorAll('.sw').forEach(x=>x.classList.remove('active'));d.classList.add('active');};
+  swBox.appendChild(d);});
+const stBox=$('#stickers');
+STICKERS.forEach((s,i)=>{const b=document.createElement('button');b.className='stk'+(i===0?' active':'');
+  b.textContent=s;
+  b.onclick=()=>{sfx.click();S.sticker=s;S.tool='sticker';
+    document.querySelectorAll('#toolGrid .tbtn').forEach(x=>x.classList.toggle('active',x.dataset.tool==='sticker'));
+    stBox.querySelectorAll('.stk').forEach(x=>x.classList.remove('active'));b.classList.add('active');};
+  stBox.appendChild(b);});
+$('#muteBtn').onclick=()=>{S.muted=!S.muted;$('#muteBtn').textContent=S.muted?'🔇':'🔊';};
+
+/* ═══════════════ КЛАССИФИКАЦИЯ ЦВЕТА ═══════════════ */
+function bucketOf(r,g,b){const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/510;
+  const d=mx-mn; let s=0; if(d>0)s=d/(255-Math.abs(mx+mn-255));
+  if(l<=.16)return 'black';
+  if(s<=.20)return l>=.6?'white':'black';
+  let h; if(mx===r)h=((g-b)/d)%6; else if(mx===g)h=(b-r)/d+2; else h=(r-g)/d+4;
+  h=Math.round(h*60); if(h<0)h+=360;
+  if(h<14||h>=346)return 'red';
+  if(h<42)return l<.40?'brown':'orange';
+  if(h<68)return 'yellow';
+  if(h<160)return 'green';
+  if(h<198)return 'teal';
+  if(h<252)return 'blue';
+  if(h<292)return 'purple';
+  return 'pink';}
+
+/* ═══════════════ ОЦЕНКА ═══════════════ */
+function analyze(){ const img=pctx.getImageData(0,0,CW,CH).data, mask=S.mask;
+  let total=0,painted=0; const buckets={};
+  for(let i=0;i<img.length;i+=16){ // шаг 4 пикселя
+    if(mask[i+3]<128)continue; total++;
+    if(img[i+3]>40){painted++;
+      const bk=bucketOf(img[i],img[i+1],img[i+2]);
+      buckets[bk]=(buckets[bk]||0)+1;}}
+  return {coverage:total?painted/total:0, buckets, painted,
+    bucketsUsed:Object.keys(buckets).length};}
+
+function evalOrder(o){ const a=analyze(); const rows=[]; let score=0;
+  const stkCount=e=>S.stickers.filter(s=>s===e).length;
+  if(o.type==='free'){
+    const c1=Math.min(a.coverage/.5,1), c2=Math.min(a.bucketsUsed/4,1), c3=Math.min(S.stickers.length/5,1);
+    score=.4*c1+.3*c2+.3*c3;
+    rows.push({ok:a.coverage>=.35,txt:'🎨 покрытие '+Math.round(a.coverage*100)+'%'});
+    rows.push({ok:a.bucketsUsed>=3,txt:'🌈 цветов: '+a.bucketsUsed});
+    rows.push({ok:S.stickers.length>=3,txt:'🎀 наклеек: '+S.stickers.length});
+  } else {
+    const share=a.painted?(a.buckets[o.color.bucket]||0)/a.painted:0;
+    const cPts=share>=.35?1:share>=.18?.5:0;
+    rows.push({ok:cPts===1,txt:'🎨 цвет «'+o.color.label+'»: '+Math.round(share*100)+'%',half:cPts===.5});
+    let wColor=.65,wCov=.35;
+    if(o.type==='exact'){
+      const have=stkCount(o.sticker), ss=Math.min(have/o.need,1);
+      rows.push({ok:have>=o.need,txt:o.sticker+' ×'+o.need+': наклеено '+have});
+      score=.42*cPts+.4*ss+.18*Math.min(a.coverage/.5,1);
+    } else score=wColor*cPts+wCov*Math.min(a.coverage/.5,1);
+  }
+  let stars=1+Math.round(score*4); stars=Math.max(1,Math.min(5,stars));
+  if(a.coverage<.02)stars=1;
+  return {stars,rows};}
+
+/* ═══════════════ КЛИЕНТЫ ═══════════════ */
+function genOrder(){ const r=Math.random();
+  let type; if(S.day===1&&S.clientIdx===0)type='free';
+  else type=r<.5?'exact':r<.78?'color':'free';
+  const color=COLORS[Math.floor(Math.random()*COLORS.length)];
+  const sticker=STICKERS[Math.floor(Math.random()*STICKERS.length)];
+  const need=Math.min(5,2+Math.floor(Math.random()*Math.min(4,1+S.day)));
+  let pat=Math.max(38,70-S.day*5);
+  if(type==='color')pat+=8; if(type==='free')pat+=14;
+  return {type,color,sticker,need,pat,
+    name:NAMES[Math.floor(Math.random()*NAMES.length)],
+    avatar:AVATARS[Math.floor(Math.random()*AVATARS.length)],
+    greet:GREETS[Math.floor(Math.random()*GREETS.length)]};}
+
+function renderClient(){ const o=S.order;
+  $('#avatar').textContent=o.avatar; $('#clientName').textContent=o.name;
+  $('#greetTxt').textContent=o.greet+' «'+S.model.name+'»!';
+  const chips=$('#orderChips'); chips.innerHTML='';
+  if(o.type==='free'){chips.innerHTML='<span class="chip free">🎨 на свой вкус — удиви меня!</span>';}
+  else{
+    chips.innerHTML+='<span class="chip"><i style="background:'+o.color.hex+'"></i>цвет: '+o.color.label+'</span>';
+    if(o.type==='exact')chips.innerHTML+='<span class="chip">'+o.sticker+' ×'+o.need+'</span>';}
+  const w=$('#clientWrap');w.classList.remove('in','out');void w.offsetWidth;w.classList.add('in');}
+
+function startPatience(){ clearInterval(S.patTimer);
+  S.patTotal=S.patLeft=S.order.pat;
+  $('#patFill').style.width='100%';
+  S.patTimer=setInterval(()=>{ if(S.busy)return;
+    S.patLeft-=.1;
+    const f=Math.max(0,S.patLeft/S.patTotal);
+    $('#patFill').style.width=(f*100)+'%';
+    $('#patFill').style.background=f>.5?'linear-gradient(90deg,#7ad64a,#c8e05a)':
+      f>.25?'linear-gradient(90deg,#f5a623,#ffd23f)':'linear-gradient(90deg,#e63946,#ff6b57)';
+    $('#patTime').textContent=Math.ceil(S.patLeft)+' c';
+    const face=f>.55?'😊':f>.25?'😐':'😠';
+    $('#patFace').textContent=face+' терпение'; $('#clientMood').textContent=face;
+    if(S.patLeft<=0){walkOut();}},100);}
+
+function nextClient(){ S.clientIdx++;
+  if(S.clientIdx>S.clientsTotal){endDay();return;}
+  S.order=genOrder();
+  setupCase(MODELS[Math.floor(Math.random()*MODELS.length)]);
+  renderClient(); updateTop();
+  S.busy=false; $('#deliverBtn').disabled=false;
+  startPatience();}
+
+function walkOut(){ S.busy=true; clearInterval(S.patTimer); $('#deliverBtn').disabled=true;
+  sfx.bad(); S.hearts--; S.combo=0; updateTop();
+  $('#bench').classList.add('shake'); setTimeout(()=>$('#bench').classList.remove('shake'),450);
+  const t=$('#toast'); t.className='angry';
+  $('#tStars').textContent='💢';
+  $('#tPhrase').textContent='«'+S.order.name+'» не дождался(-ась) и ушёл(-ла)! −❤️';
+  $('#tRows').innerHTML=''; $('#tMoney').textContent='';
+  t.classList.add('show');
+  setTimeout(()=>{t.classList.remove('show');
+    if(S.hearts<=0){gameOver();return;}
+    $('#clientWrap').classList.add('out');
+    setTimeout(nextClient,450);},2100);}
+
+$('#deliverBtn').onclick=()=>{ if(S.busy)return; deliver();};
+function deliver(){ S.busy=true; clearInterval(S.patTimer); $('#deliverBtn').disabled=true;
+  const res=evalOrder(S.order); const o=S.order;
+  sfx.swoosh();
+  let money=res.stars*90;
+  if(res.stars===5)money+=150;
+  if(res.stars>=4){S.combo++; money+=(S.combo-1)*40;} else S.combo=0;
+  if(res.stars===1){money=0; S.hearts--;}
+  S.money+=money; S.dayEarn+=money; S.served++;
+  const t=$('#toast'); t.className='';
+  $('#tStars').textContent='★'.repeat(res.stars)+'☆'.repeat(5-res.stars);
+  $('#tStars').style.color=res.stars>=4?'#e8a800':res.stars>=3?'#8a6d3b':'#b34040';
+  const ph=PHRASES[res.stars];
+  $('#tPhrase').textContent='«'+ph[Math.floor(Math.random()*ph.length)]+'»';
+  $('#tRows').innerHTML=res.rows.map(r=>'<span class="chip '+(r.ok?'ok':'bad')+'">'+(r.ok?'✔ ':'✘ ')+r.txt+'</span>').join('');
+  $('#tMoney').textContent=money>0?('+'+money+' ₽'+(res.stars===5?' · чаевые!':'')+(S.combo>1?' · серия ×'+S.combo+'!':'')):'увы, без оплаты…';
+  if(res.stars>=4)sfx.good(); else if(res.stars===1)sfx.bad(); else sfx.coin();
+  updateTop();
+  if(money>0)flyMoney('+'+money+' ₽');
+  t.classList.add('show');
+  setTimeout(()=>{t.classList.remove('show');
+    if(S.hearts<=0){gameOver();return;}
+    $('#clientWrap').classList.add('out');
+    setTimeout(nextClient,450);},2400);}
+
+function flyMoney(txt){ const el=document.createElement('div');el.className='fly-money';
+  el.textContent=txt;
+  const r=$('#deliverBtn').getBoundingClientRect();
+  el.style.left=(r.left+r.width/2-40)+'px'; el.style.top=(r.top-10)+'px';
+  document.body.appendChild(el); setTimeout(()=>el.remove(),1300);}
+
+/* ═══════════════ UI ═══════════════ */
+function updateTop(){ $('#dayInfo').textContent='День '+S.day+' · Клиент '+Math.min(S.clientIdx,S.clientsTotal)+'/'+S.clientsTotal;
+  const m=$('#moneyEl'); m.textContent=S.money.toLocaleString('ru-RU')+' ₽';
+  m.classList.remove('pop'); void m.offsetWidth; m.classList.add('pop');
+  $('#heartsEl').textContent='❤️'.repeat(S.hearts)+'🖤'.repeat(3-S.hearts);}
+
+function endDay(){ S.busy=true; clearInterval(S.patTimer);
+  const healed=S.hearts<3;
+  $('#dayOvSub').textContent='день '+S.day+' позади — витрина сияет краской!';
+  $('#dayEarnV').textContent='+'+S.dayEarn+' ₽';
+  $('#dayTotalV').textContent=S.money.toLocaleString('ru-RU')+' ₽';
+  $('#dayHeartsV').textContent='❤️'.repeat(S.hearts)+'🖤'.repeat(3-S.hearts);
+  $('#coffeeV').textContent=healed?'☕ Чашка кофе после смены: +1 ❤️':'';
+  if(healed)S.hearts++;
+  $('#dayOv').classList.add('show'); sfx.good();}
+
+$('#nextDayBtn').onclick=()=>{ sfx.click(); $('#dayOv').classList.remove('show');
+  S.day++; S.clientIdx=0; S.dayEarn=0;
+  S.clientsTotal=Math.min(8,3+S.day);
+  updateTop(); setTimeout(nextClient,300);};
+
+function gameOver(){ S.busy=true; clearInterval(S.patTimer);
+  $('#ovDays').textContent=S.day;
+  $('#ovMoney').textContent=S.money.toLocaleString('ru-RU')+' ₽';
+  $('#ovClients').textContent=S.served;
+  $('#overOv').classList.add('show');}
+
+$('#retryBtn').onclick=()=>{ sfx.click(); $('#overOv').classList.remove('show');
+  Object.assign(S,{day:1,clientIdx:0,clientsTotal:4,money:0,hearts:3,combo:0,served:0,dayEarn:0});
+  updateTop(); setTimeout(nextClient,300);};
+
+$('#startBtn').onclick=()=>{ ac(); sfx.good(); $('#startOv').classList.remove('show');
+  updateTop(); setTimeout(nextClient,350);};
+
+/* первая отрисовка за заставкой */
+setupCase(MODELS[0]); updateTop();
+</script>
+</body>
+</html>
